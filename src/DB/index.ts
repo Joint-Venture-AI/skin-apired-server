@@ -5,12 +5,11 @@ import { USER_ROLES } from '../enums/user';
 import { logger } from '../shared/logger';
 
 const superUser = {
-  name: 'Admin',
+  firstName: 'Admin',
   role: USER_ROLES.ADMIN,
   email: config.admin.email,
   password: config.admin.password,
-  image:
-    'https://www.shutterstock.com/shutterstock/photos/1153673752/display_1500/stock-vector-profile-placeholder-image-gray-silhouette-no-photo-1153673752.jpg',
+  image: '/public/image/placeholder.png',
   verified: true,
 };
 
