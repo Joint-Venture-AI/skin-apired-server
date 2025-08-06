@@ -69,67 +69,54 @@ const createUserFromDb = async (payload: IUser) => {
 };
 
 const getAllUsers = async (query: Record<string, unknown>) => {
-  const {
-    searchTerm,
-    page = 1,
-    limit = 10,
-    sortBy = 'createdAt',
-    order = 'desc',
-    ...filterData
-  } = query;
+  const { page, limit, searchTerm, ...filterData } = query;
 
-  // Search conditions
-  const conditions: any[] = [];
-
+  const anyConditions: any[] = [];
   if (searchTerm) {
-    conditions.push({
-      $or: [{ name: { $regex: searchTerm, $options: 'i' } }],
+    anyConditions.push({
+      $or: [
+        { firstName: { $regex: searchTerm, $options: 'i' } },
+        { lastName: { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } },
+      ],
     });
   }
 
-  // Add filter conditions
-  if (Object.keys(filterData).length > 0) {
-    const filterConditions = Object.entries(filterData).map(
-      ([field, value]) => ({
-        [field]: value,
-      })
-    );
-    conditions.push({ $and: filterConditions });
+  anyConditions.push({
+    role: { $ne: USER_ROLES.ADMIN },
+  });
+
+  if (Object.keys(filterData).length) {
+    anyConditions.push({
+      $or: Object.entries(filterData).map(([key, value]) => ({
+        [key]: { $regex: value, $options: 'i' },
+      })),
+    });
   }
 
-  conditions.push({ role: USER_ROLES.USER });
+  const whereConditions =
+    anyConditions.length > 0 ? { $and: anyConditions } : {};
 
-  const whereConditions = conditions.length ? { $and: conditions } : {};
+  const pageAsNumber = Number(page) || 1;
+  const limitAsNumber = Number(limit) || 10;
+  const skip = (pageAsNumber - 1) * limitAsNumber;
 
-  // Pagination setup
-  const currentPage = Number(page);
-  const pageSize = Number(limit);
-  const skip = (currentPage - 1) * pageSize;
+  const sortCondition: { [key: string]: SortOrder } = { createdAt: -1 };
 
-  // Sorting setup
-  const sortOrder = order === 'desc' ? -1 : 1;
-  const sortCondition: { [key: string]: SortOrder } = {
-    [sortBy as string]: sortOrder,
-  };
-
-  // Query the database
-  const [users, total] = await Promise.all([
-    User.find(whereConditions)
-      .sort(sortCondition)
-      .skip(skip)
-      .limit(pageSize)
-      .lean<IUser[]>(), // Assert type
-    User.countDocuments(whereConditions),
-  ]);
+  const result = await User.find(whereConditions)
+    .sort(sortCondition)
+    .skip(skip)
+    .limit(limitAsNumber)
+    .lean();
+  const total = await User.countDocuments(whereConditions);
 
   return {
-    data: users,
     meta: {
+      page: pageAsNumber,
+      limit: limitAsNumber,
       total,
-      limit: pageSize,
-      totalPages: Math.ceil(total / pageSize),
-      currentPage,
     },
+    data: result,
   };
 };
 

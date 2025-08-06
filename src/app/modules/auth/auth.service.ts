@@ -21,12 +21,12 @@ import deleteFile from '../../../util/file/deleteFile';
 
 const googleLogin = async ({
   email,
-  name,
+  firstName,
   image,
   uid,
 }: {
   email: string;
-  name: string;
+  firstName: string;
   image: string;
   uid: string;
 }) => {
@@ -39,7 +39,7 @@ const googleLogin = async ({
   if (!user) {
     user = await User.create({
       email,
-      name,
+      firstName,
       googleId: uid,
       image: newImage,
       role: USER_ROLES.USER,
@@ -56,7 +56,7 @@ const googleLogin = async ({
       if (oldImage) await deleteFile(oldImage);
     }
 
-    Object.assign(user, { name, image: newImage, googleId: uid });
+    Object.assign(user, { firstName, image: newImage, googleId: uid });
     await user.save();
   }
 

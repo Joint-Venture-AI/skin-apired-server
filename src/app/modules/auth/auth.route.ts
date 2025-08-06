@@ -14,8 +14,6 @@ router.post(
 
 router.post('/google-login', AuthController.googleLogin);
 
-router.post('/facebook-login', AuthController.faceBookLogin);
-
 router.post('/refresh-token', AuthController.newAccessToken);
 
 router.post(

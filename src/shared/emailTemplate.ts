@@ -7,7 +7,7 @@ const createAccount = (values: ICreateAccount) => {
     html: `
 <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;">
   <div style="max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; padding: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-    <h2 style="color: #333333; font-size: 22px;">Hi ${values.name},</h2>
+    <h2 style="color: #333333; font-size: 22px;">Hi</h2>
     <p style="color: #555555; font-size: 16px; line-height: 1.6;">
       Thank you for signing up. Your one-time verification code is below:
     </p>
