@@ -9,6 +9,7 @@ export type IUser = {
   password: string;
   verified: boolean;
   image: string;
+  fcmToken?: string;
   dateOfBirth?: string;
   googleId?: string;
   authentication?: {

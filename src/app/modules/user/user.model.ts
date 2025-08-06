@@ -52,6 +52,10 @@ const userSchema = new Schema<IUser, UserModal>(
       type: String,
       required: false,
     },
+    fcmToken: {
+      type: String,
+      required: false,
+    },
 
     authentication: {
       type: {
