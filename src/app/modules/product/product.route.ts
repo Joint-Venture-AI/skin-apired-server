@@ -21,4 +21,46 @@ router.post(
   }
 );
 
+router.patch(
+  '/update/:id',
+  auth(USER_ROLES.ADMIN),
+  fileUploadHandler,
+  (req: Request, res: Response, next: NextFunction) => {
+    const { imagesToDelete, data } = req.body;
+
+    if (!data && imagesToDelete) {
+      req.body = { imagesToDelete };
+      return ProductController.updateProduct(req, res, next);
+    }
+
+    if (data) {
+      const parsedData = ProductValidation.updateProductSchema.parse(
+        JSON.parse(data)
+      );
+
+      req.body = { ...parsedData, imagesToDelete };
+    }
+
+    return ProductController.updateProduct(req, res, next);
+  }
+);
+
+router.get(
+  '/details/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  ProductController.getDetails
+);
+
+router.get(
+  '/get-all',
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  ProductController.getAllProduct
+);
+
+router.get(
+  '/get-recommended/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  ProductController.getRecommendedProducts
+);
+
 export const ProductRoutes = router;

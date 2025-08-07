@@ -12,7 +12,7 @@ const createProduct = catchAsync(async (req, res) => {
   let image = getFilePathMultiple(req.files, 'image', 'image');
 
   if (image && image.length > 0) {
-    data.image = image[0];
+    data.image = image;
   }
 
   const result = await ProductService.createProduct(data);
@@ -24,6 +24,63 @@ const createProduct = catchAsync(async (req, res) => {
   });
 });
 
+const updateProduct = catchAsync(async (req, res) => {
+  const data = {
+    ...req.body,
+  };
+
+  let image = getFilePathMultiple(req.files, 'image', 'image');
+
+  if (image && image.length > 0) {
+    data.image = image;
+  }
+
+  const result = await ProductService.updateProduct(req.params.id, data);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Product created successfully',
+    data: result,
+  });
+});
+
+const getDetails = catchAsync(async (req, res) => {
+  const result = await ProductService.getDetails(req.params.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Product retrived successfully',
+    data: result,
+  });
+});
+
+const getAllProduct = catchAsync(async (req, res) => {
+  const result = await ProductService.getAllProduct(req.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Product retrived successfully',
+    data: result,
+  });
+});
+
+const getRecommendedProducts = catchAsync(async (req, res) => {
+  const result = await ProductService.getRecommendedProducts(
+    req.params.id,
+    req.query
+  );
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Product retrived successfully',
+    data: result,
+  });
+});
+
 export const ProductController = {
   createProduct,
+  updateProduct,
+  getDetails,
+  getAllProduct,
+  getRecommendedProducts,
 };

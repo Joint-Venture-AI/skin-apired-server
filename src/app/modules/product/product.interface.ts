@@ -7,3 +7,7 @@ export type IProduct = {
   howToUse: string[];
   skinCondition: Types.ObjectId;
 };
+
+export type UpdateProductPayload = Partial<IProduct> & {
+  imagesToDelete?: string[];
+};
