@@ -39,6 +39,8 @@ const sendNotifications = async (payload: IPushNotification) => {
       data,
     });
 
+    console.log(notification);
+
     // Log results into PushNotification collection
     const result = await PushNotification.create({
       title,
