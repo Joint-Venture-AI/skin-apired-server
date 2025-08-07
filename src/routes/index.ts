@@ -5,6 +5,7 @@ import { NotificationRoutes } from '../app/modules/Notification/Notification.rou
 import { PersonalisationRoutes } from '../app/modules/personalisation/personalisation.route';
 import { PushNotificationRoutes } from '../app/modules/pushNotification/pushNotification.route';
 import { SkinConditionRoutes } from '../app/modules/skinCondition/skinCondition.route';
+import { ProductRoutes } from '../app/modules/product/product.route';
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ const apiRoutes = [
   { path: '/personalisation', route: PersonalisationRoutes },
   { path: '/push-notification', route: PushNotificationRoutes },
   { path: '/skin-condition', route: SkinConditionRoutes },
+  { path: '/product', route: ProductRoutes },
 ];
 
 apiRoutes.forEach(route => router.use(route.path, route.route));
