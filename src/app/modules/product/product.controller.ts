@@ -72,7 +72,17 @@ const getRecommendedProducts = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Product retrived successfully',
+    message: 'Product recommended retrived successfully',
+    data: result,
+  });
+});
+
+const getRelevantProducts = catchAsync(async (req, res) => {
+  const result = await ProductService.getRelevantProducts(req.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Product relevant retrived successfully',
     data: result,
   });
 });
@@ -83,4 +93,5 @@ export const ProductController = {
   getDetails,
   getAllProduct,
   getRecommendedProducts,
+  getRelevantProducts,
 };

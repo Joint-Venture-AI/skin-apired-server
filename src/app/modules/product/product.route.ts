@@ -63,4 +63,10 @@ router.get(
   ProductController.getRecommendedProducts
 );
 
+router.get(
+  '/get-relevant',
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  ProductController.getRelevantProducts
+);
+
 export const ProductRoutes = router;
