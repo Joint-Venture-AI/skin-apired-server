@@ -10,6 +10,13 @@ const createSkinConditionZodSchema = z.object({
     }),
 });
 
+const updateSkinConditionZodSchema = z.object({
+  skinType: z.string().optional(),
+  symptmos: z.string().optional(),
+  treatment: z.array(z.string()).optional(),
+});
+
 export const SkinConditionValidation = {
   createSkinConditionZodSchema,
+  updateSkinConditionZodSchema,
 };
