@@ -35,4 +35,16 @@ router.patch(
   }
 );
 
+router.get(
+  '/details/:id',
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  SkinConditionController.getDetailsSkinCondition
+);
+
+router.get(
+  '/get-all',
+  auth(USER_ROLES.ADMIN, USER_ROLES.USER),
+  SkinConditionController.getAllSkinCondition
+);
+
 export const SkinConditionRoutes = router;

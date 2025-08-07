@@ -44,7 +44,31 @@ const updateSkinCondition = catchAsync(async (req, res) => {
   });
 });
 
+const getDetailsSkinCondition = catchAsync(async (req, res) => {
+  const result = await SkinConditionService.getDetailsSkinCondition(
+    req.params.id
+  );
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Skin Condition retrived successfully',
+    data: result,
+  });
+});
+
+const getAllSkinCondition = catchAsync(async (req, res) => {
+  const result = await SkinConditionService.getAllSkinCondition(req.query);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Skin Condition retrived successfully',
+    data: result,
+  });
+});
+
 export const SkinConditionController = {
   createSkinCondition,
   updateSkinCondition,
+  getDetailsSkinCondition,
+  getAllSkinCondition,
 };
