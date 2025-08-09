@@ -7,6 +7,7 @@ import { PushNotificationRoutes } from '../app/modules/pushNotification/pushNoti
 import { SkinConditionRoutes } from '../app/modules/skinCondition/skinCondition.route';
 import { ProductRoutes } from '../app/modules/product/product.route';
 import { AddRoutineRoutes } from '../app/modules/addRoutine/addRoutine.route';
+import { PhotoProgessRoutes } from '../app/modules/photoProgess/photoProgess.route';
 
 const router = express.Router();
 
@@ -19,6 +20,7 @@ const apiRoutes = [
   { path: '/skin-condition', route: SkinConditionRoutes },
   { path: '/product', route: ProductRoutes },
   { path: '/add-routine', route: AddRoutineRoutes },
+  { path: '/photo-progress', route: PhotoProgessRoutes },
 ];
 
 apiRoutes.forEach(route => router.use(route.path, route.route));

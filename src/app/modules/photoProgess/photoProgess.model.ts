@@ -14,6 +14,7 @@ const photoProgessSchema = new Schema<IProgress>(
     type: {
       type: String,
       required: true,
+      enum: ['left', 'right', 'front'],
     },
     date: {
       type: String,
