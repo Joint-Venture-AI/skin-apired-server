@@ -72,12 +72,20 @@ const getAllRoutine = async (user: string, query: Record<string, unknown>) => {
   const anyConditions: any[] = [];
 
   if (searchTerm) {
-    anyConditions.push({
-      $or: [
-        { startDate: { $regex: searchTerm, $options: 'i' } },
-        { endDate: { $regex: searchTerm, $options: 'i' } },
-      ],
-    });
+    // @ts-ignore
+    const searchDate = new Date(searchTerm);
+
+    if (!isNaN(searchDate.getTime())) {
+      // Date search
+      anyConditions.push({
+        $or: [{ startDate: searchDate }, { endDate: searchDate }],
+      });
+    } else {
+      // String search fallback
+      anyConditions.push({
+        $or: [{ someStringField: { $regex: searchTerm, $options: 'i' } }],
+      });
+    }
   }
 
   if (Object.keys(filterData).length > 0) {
