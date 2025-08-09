@@ -38,9 +38,17 @@ const getRoutineInHome = async (
   const size = parseInt(limit as string) || 10;
   const skip = (pages - 1) * size;
 
-  const filter = { user };
+  const filter = {
+    user,
+    status: { $ne: 'completed' },
+  };
 
   const result = await AddRoutine.find(filter)
+    .select('category product')
+    .populate({
+      path: 'product',
+      select: 'productName -_id',
+    })
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(size)
@@ -58,7 +66,71 @@ const getRoutineInHome = async (
   return data;
 };
 
+const getAllRoutine = async (user: string, query: Record<string, unknown>) => {
+  const { page, limit, searchTerm, ...filterData } = query;
+
+  const anyConditions: any[] = [];
+
+  if (searchTerm) {
+    anyConditions.push({
+      $or: [
+        { startDate: { $regex: searchTerm, $options: 'i' } },
+        { endDate: { $regex: searchTerm, $options: 'i' } },
+      ],
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    const filterConditions = Object.entries(filterData).map(
+      ([field, value]) => ({ [field]: value })
+    );
+    anyConditions.push({ $and: filterConditions });
+  }
+
+  anyConditions.push({ user });
+  anyConditions.push({ status: { $ne: 'completed' } });
+
+  const whereConditions =
+    anyConditions.length > 0 ? { $and: anyConditions } : {};
+
+  const pages = parseInt(page as string) || 1;
+  const size = parseInt(limit as string) || 10;
+  const skip = (pages - 1) * size;
+
+  const result = await AddRoutine.find(whereConditions)
+    .populate({
+      path: 'product',
+      //   select: 'productName -_id',
+    })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(size)
+    .lean();
+
+  const total = await AddRoutine.countDocuments(whereConditions);
+  const data: any = {
+    result,
+    meta: {
+      page: pages,
+      limit: size,
+      total,
+    },
+  };
+  return data;
+};
+
+const chanageStatus = async (id: string) => {
+  const result = await AddRoutine.findOneAndUpdate(
+    { _id: id },
+    { status: 'completed' },
+    { new: true }
+  );
+  return result;
+};
+
 export const AddRoutineService = {
   addRoutine,
   getRoutineInHome,
+  getAllRoutine,
+  chanageStatus,
 };

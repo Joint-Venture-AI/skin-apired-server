@@ -27,7 +27,29 @@ const getRoutineInHome = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,
-    message: 'Routine added successfully',
+    message: 'Routine retrieved successfully',
+    data: result,
+  });
+});
+
+const getAllRoutine = catchAsync(async (req, res) => {
+  const user = req.user.id;
+
+  const result = await AddRoutineService.getAllRoutine(user, req.query);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Routine retrieved successfully',
+    data: result,
+  });
+});
+
+const chanageStatus = catchAsync(async (req, res) => {
+  const result = await AddRoutineService.chanageStatus(req.params.id);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Routine status changed successfully',
     data: result,
   });
 });
@@ -35,4 +57,6 @@ const getRoutineInHome = catchAsync(async (req, res) => {
 export const AddRoutineController = {
   addRoute,
   getRoutineInHome,
+  getAllRoutine,
+  chanageStatus,
 };

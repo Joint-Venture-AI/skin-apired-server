@@ -13,4 +13,16 @@ router.get(
   AddRoutineController.getRoutineInHome
 );
 
+router.get(
+  '/get-all',
+  auth(USER_ROLES.USER),
+  AddRoutineController.getAllRoutine
+);
+
+router.patch(
+  '/change-status/:id',
+  auth(USER_ROLES.USER),
+  AddRoutineController.chanageStatus
+);
+
 export const AddRoutineRoutes = router;

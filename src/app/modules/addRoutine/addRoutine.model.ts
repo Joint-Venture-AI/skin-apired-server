@@ -11,7 +11,12 @@ const routeSchema = new Schema<IAddRoutine>(
     product: { type: Schema.Types.ObjectId, ref: 'Product', required: true },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     additionalIntroduction: { type: String, required: false },
-    status: { type: String, required: true, default: 'pending' },
+    status: {
+      type: String,
+      required: true,
+      default: 'pending',
+      enum: ['pending', 'completed'],
+    },
   },
   {
     timestamps: true,
