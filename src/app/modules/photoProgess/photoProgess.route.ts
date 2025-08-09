@@ -19,4 +19,10 @@ router.post(
   }
 );
 
+router.get(
+  '/get-timeline',
+  auth(USER_ROLES.USER),
+  PhotoProgessController.getPhotoProgressTimeLine
+);
+
 export const PhotoProgessRoutes = router;
