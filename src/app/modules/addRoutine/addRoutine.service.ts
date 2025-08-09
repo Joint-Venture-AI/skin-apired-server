@@ -3,6 +3,8 @@ import ApiError from '../../../errors/ApiError';
 import { IAddRoutine } from './addRoutine.interface';
 import { AddRoutine } from './addRoutine.model';
 import { Product } from '../product/product.model';
+import { startOfMonth } from 'date-fns';
+import mongoose from 'mongoose';
 
 const addRoutine = async (payload: IAddRoutine) => {
   const isExistProduct = await Product.findOne({
@@ -136,9 +138,43 @@ const chanageStatus = async (id: string) => {
   return result;
 };
 
+const getRoutineDataChart = async (user: string) => {
+  const result = await AddRoutine.aggregate([
+    {
+      $match: { user: new mongoose.Types.ObjectId(user) },
+    },
+    {
+      $group: {
+        _id: {
+          month: { $month: '$createdAt' },
+          year: { $year: '$createdAt' },
+          status: '$status',
+        },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $sort: { '_id.year': 1, '_id.month': 1 },
+    },
+  ]);
+
+  // Transform data for chart.js or similar
+  const chartData: Record<string, any> = {};
+  result.forEach(item => {
+    const monthYear = `${item._id.month}-${item._id.year}`;
+    if (!chartData[monthYear]) {
+      chartData[monthYear] = {};
+    }
+    chartData[monthYear][item._id.status] = item.count;
+  });
+
+  return chartData;
+};
+
 export const AddRoutineService = {
   addRoutine,
   getRoutineInHome,
   getAllRoutine,
   chanageStatus,
+  getRoutineDataChart,
 };

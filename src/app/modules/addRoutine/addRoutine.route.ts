@@ -25,4 +25,10 @@ router.patch(
   AddRoutineController.chanageStatus
 );
 
+router.get(
+  '/get-data-chart',
+  auth(USER_ROLES.USER),
+  AddRoutineController.getRoutineDataChart
+);
+
 export const AddRoutineRoutes = router;

@@ -54,9 +54,20 @@ const chanageStatus = catchAsync(async (req, res) => {
   });
 });
 
+const getRoutineDataChart = catchAsync(async (req, res) => {
+  const result = await AddRoutineService.getRoutineDataChart(req.user.id);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Routine chart retrieved successfully',
+    data: result,
+  });
+});
+
 export const AddRoutineController = {
   addRoute,
   getRoutineInHome,
   getAllRoutine,
   chanageStatus,
+  getRoutineDataChart,
 };
