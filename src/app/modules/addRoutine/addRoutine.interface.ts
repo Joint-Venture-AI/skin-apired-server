@@ -9,4 +9,5 @@ export type IAddRoutine = {
   order: number;
   timeOfDay: string[];
   additionalIntroduction?: string;
+  status: string;
 };

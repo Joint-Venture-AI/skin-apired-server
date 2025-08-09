@@ -20,6 +20,19 @@ const addRoute = catchAsync(async (req, res) => {
   });
 });
 
+const getRoutineInHome = catchAsync(async (req, res) => {
+  const user = req.user.id;
+
+  const result = await AddRoutineService.getRoutineInHome(user, req.query);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: 'Routine added successfully',
+    data: result,
+  });
+});
+
 export const AddRoutineController = {
   addRoute,
+  getRoutineInHome,
 };

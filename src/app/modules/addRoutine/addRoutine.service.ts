@@ -16,6 +16,7 @@ const addRoutine = async (payload: IAddRoutine) => {
   const isExistRoute = await AddRoutine.findOne({
     startDate: payload.startDate,
     endDate: payload.endDate,
+    user: payload.user,
   });
   if (isExistRoute) {
     throw new Error(
@@ -27,6 +28,37 @@ const addRoutine = async (payload: IAddRoutine) => {
   return newAddRoutine;
 };
 
+const getRoutineInHome = async (
+  user: string,
+  query: Record<string, unknown>
+) => {
+  const { page, limit } = query;
+
+  const pages = parseInt(page as string) || 1;
+  const size = parseInt(limit as string) || 10;
+  const skip = (pages - 1) * size;
+
+  const filter = { user };
+
+  const result = await AddRoutine.find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(size)
+    .lean();
+
+  const total = await AddRoutine.countDocuments(filter);
+  const data: any = {
+    result,
+    meta: {
+      page: pages,
+      limit: size,
+      total,
+    },
+  };
+  return data;
+};
+
 export const AddRoutineService = {
   addRoutine,
+  getRoutineInHome,
 };
