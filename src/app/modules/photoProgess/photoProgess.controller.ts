@@ -42,7 +42,20 @@ const getPhotoProgressTimeLine = catchAsync(async (req, res) => {
   });
 });
 
+const getAllPhoto = catchAsync(async (req, res) => {
+  const user = req.user.id;
+
+  const result = await PhotoProgessService.getAllPhoto(user, req.query);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Photo progress retrieved successfully',
+    data: result,
+  });
+});
+
 export const PhotoProgessController = {
   createPhotoProgress,
   getPhotoProgressTimeLine,
+  getAllPhoto,
 };

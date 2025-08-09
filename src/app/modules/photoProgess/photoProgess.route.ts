@@ -25,4 +25,10 @@ router.get(
   PhotoProgessController.getPhotoProgressTimeLine
 );
 
+router.get(
+  '/get-all',
+  auth(USER_ROLES.USER),
+  PhotoProgessController.getAllPhoto
+);
+
 export const PhotoProgessRoutes = router;
