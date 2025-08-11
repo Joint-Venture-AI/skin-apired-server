@@ -8,6 +8,7 @@ import { SkinConditionRoutes } from '../app/modules/skinCondition/skinCondition.
 import { ProductRoutes } from '../app/modules/product/product.route';
 import { AddRoutineRoutes } from '../app/modules/addRoutine/addRoutine.route';
 import { PhotoProgessRoutes } from '../app/modules/photoProgess/photoProgess.route';
+import { DashboardRoutes } from '../app/modules/dashboard/dashboard.route';
 
 const router = express.Router();
 
@@ -21,6 +22,7 @@ const apiRoutes = [
   { path: '/product', route: ProductRoutes },
   { path: '/add-routine', route: AddRoutineRoutes },
   { path: '/photo-progress', route: PhotoProgessRoutes },
+  { path: '/dashboard', route: DashboardRoutes },
 ];
 
 apiRoutes.forEach(route => router.use(route.path, route.route));
