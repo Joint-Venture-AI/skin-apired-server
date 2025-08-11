@@ -72,54 +72,48 @@ const getAllUsers = async (query: Record<string, unknown>) => {
   const { page, limit, searchTerm, ...filterData } = query;
 
   const anyConditions: any[] = [];
+
   if (searchTerm) {
     anyConditions.push({
-      $or: [
-        { firstName: { $regex: searchTerm, $options: 'i' } },
-        { lastName: { $regex: searchTerm, $options: 'i' } },
-        { email: { $regex: searchTerm, $options: 'i' } },
-      ],
+      $or: [{ type: { $regex: searchTerm, $options: 'i' } }],
     });
   }
 
-  anyConditions.push({
-    role: { $ne: USER_ROLES.ADMIN },
-  });
-
-  if (Object.keys(filterData).length) {
-    anyConditions.push({
-      $or: Object.entries(filterData).map(([key, value]) => ({
-        [key]: { $regex: value, $options: 'i' },
-      })),
-    });
+  if (Object.keys(filterData).length > 0) {
+    const filterConditions = Object.entries(filterData).map(
+      ([field, value]) => ({ [field]: value })
+    );
+    anyConditions.push({ $and: filterConditions });
   }
+
+  anyConditions.push({ role: { $ne: USER_ROLES.ADMIN } });
 
   const whereConditions =
     anyConditions.length > 0 ? { $and: anyConditions } : {};
 
-  const pageAsNumber = Number(page) || 1;
-  const limitAsNumber = Number(limit) || 10;
-  const skip = (pageAsNumber - 1) * limitAsNumber;
-
-  const sortCondition: { [key: string]: SortOrder } = { createdAt: -1 };
+  // Pagination setup
+  const pages = parseInt(page as string) || 1;
+  const size = parseInt(limit as string) || 10;
+  const skip = (pages - 1) * size;
 
   const result = await User.find(whereConditions)
-    .sort(sortCondition)
+    .sort({ createdAt: -1 })
     .skip(skip)
-    .limit(limitAsNumber)
+    .limit(size)
     .lean();
+
   const total = await User.countDocuments(whereConditions);
 
-  return {
+  const data: any = {
+    result,
     meta: {
-      page: pageAsNumber,
-      limit: limitAsNumber,
+      page: pages,
+      limit: size,
       total,
     },
-    data: result,
   };
+  return data;
 };
-
 const getUserProfileFromDB = async (
   user: JwtPayload
 ): Promise<Partial<IUser>> => {
