@@ -10,4 +10,5 @@ export type IAddRoutine = {
   timeOfDay: string[];
   additionalIntroduction?: string;
   status: string;
+  msgStatus?: string;
 };

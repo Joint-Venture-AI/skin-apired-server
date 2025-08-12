@@ -4,12 +4,9 @@ import ApiError from '../../../errors/ApiError';
 import { IAddRoutine } from './addRoutine.interface';
 import { AddRoutine } from './addRoutine.model';
 import { Product } from '../product/product.model';
-import { startOfMonth } from 'date-fns';
 import mongoose from 'mongoose';
 import { sendPushNotification } from '../../../shared/firebase';
 import { User } from '../user/user.model';
-import { IPushNotification } from '../pushNotification/pushNotification.interface';
-import { PushNotificationService } from '../pushNotification/pushNotification.service';
 import moment from 'moment';
 import { PushNotification } from '../pushNotification/pushNotification.model';
 import { logger } from '../../../shared/logger';
@@ -143,6 +140,9 @@ const chanageStatus = async (id: string) => {
     { status: 'completed' },
     { new: true }
   );
+
+  console.log(result);
+
   return result;
 };
 
@@ -235,9 +235,10 @@ const sendMsgWithTimeWise = async () => {
   try {
     const nowUTC = moment.utc();
 
-    // Find routines whose startDate is in the past and still pending
+    // Find routines with status 'pending' AND msgStatus not 'completed'
     const routines = await AddRoutine.find({
       status: 'pending',
+      msgStatus: { $ne: 'completed' }, // <-- only routines NOT completed
       startDate: { $lte: nowUTC.toDate() },
     }).select('startDate user');
 
@@ -289,6 +290,10 @@ const sendMsgWithTimeWise = async () => {
         body: 'Your routine starts now!',
         receiver: routine.user,
       });
+
+      // Update this routine's msgStatus to 'completed' to avoid future notifications
+      routine.msgStatus = 'completed';
+      await routine.save();
 
       results.push({
         userId: routine.user,

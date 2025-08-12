@@ -6,7 +6,7 @@ const pushNotificationSchema = new Schema<IPushNotification>({
   body: { type: String, required: true },
   tokens: { type: [String], required: true },
   data: { type: Object },
-  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
   status: { type: String, enum: ['sent', 'failed'], default: 'sent' },
 });
 

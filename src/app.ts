@@ -1,9 +1,11 @@
+import { AddRoutineService } from './app/modules/addRoutine/addRoutine.service';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import router from './routes';
 import { Morgan } from './shared/morgen';
+import cron from 'node-cron';
 
 const app = express();
 
@@ -14,10 +16,14 @@ app.use(Morgan.errorHandler);
 //body parser
 app.use(
   cors({
-    origin: '*', // Allow all origins for development; adjust as needed for production
+    origin: '*',
     credentials: true,
   })
 );
+
+cron.schedule('* * * * *', async () => {
+  await AddRoutineService.sendMsgWithTimeWise();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

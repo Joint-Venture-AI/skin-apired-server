@@ -55,18 +55,18 @@ import { User } from '../user/user.model';
 // };
 
 const sendNotifications = async (payload: IPushNotification) => {
-  const { title, body, data, userId } = payload;
+  const { title, body } = payload;
 
   try {
-    // Validate request data
-    if (!title || !body || !userId) {
+    // ✅ Validate request data
+    if (!title || !body) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        `Missing required fields: ${title} ${body} ${userId} ${data}`
+        `Missing required fields: ${title} ${body}`
       );
     }
 
-    // Fetch users with valid fcmToken
+    // ✅ Fetch users with valid FCM tokens
     const usersWithTokens = await User.find({
       fcmToken: { $exists: true, $ne: null },
     });
@@ -78,32 +78,34 @@ const sendNotifications = async (payload: IPushNotification) => {
       );
     }
 
-    // Extract tokens
-    const tokens: any = usersWithTokens?.map((user: any) => user.fcmToken);
+    let results: any[] = [];
 
-    // Send push notification
-    const notification = await sendPushNotification(tokens, {
-      title,
-      body,
-      data,
-    });
+    // ✅ Loop through each user and send individually
+    for (const user of usersWithTokens) {
+      const token: any = user.fcmToken;
 
-    console.log(notification);
+      // Send push notification to this user
+      const notification = await sendPushNotification([token], { title, body });
 
-    // Log results into PushNotification collection
-    const result = await PushNotification.create({
-      title,
-      body,
-      tokens,
-      data,
-      userId,
-      status: notification.error ? 'failed' : 'sent',
-    });
+      // Save to DB individually
+      const savedNotification = await PushNotification.create({
+        title,
+        body,
+        tokens: [token],
+        userId: user._id, // only one user ID
+        status: notification.error ? 'failed' : 'sent',
+      });
 
-    return notification;
+      results.push({
+        userId: user._id,
+        token,
+        status: savedNotification.status,
+      });
+    }
+
+    return results;
   } catch (error) {
-    // Error handling
-    console.error('Error sending push notification:', error);
+    console.error('Error sending push notifications:', error);
     throw error;
   }
 };

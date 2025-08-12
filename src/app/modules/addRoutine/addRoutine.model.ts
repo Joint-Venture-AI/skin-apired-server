@@ -17,6 +17,11 @@ const routeSchema = new Schema<IAddRoutine>(
       default: 'pending',
       enum: ['pending', 'completed'],
     },
+    msgStatus: {
+      type: String,
+      required: false,
+      enum: ['pending', 'completed'],
+    },
   },
   {
     timestamps: true,
