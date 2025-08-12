@@ -20,6 +20,10 @@ const notificationSchema = new Schema<INotification, NotificationModel>(
       type: String,
       required: false,
     },
+    body: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,

@@ -1,3 +1,4 @@
+import { sendNotifications } from './../../../helpers/notificationHelper';
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../errors/ApiError';
 import { IAddRoutine } from './addRoutine.interface';
@@ -5,6 +6,13 @@ import { AddRoutine } from './addRoutine.model';
 import { Product } from '../product/product.model';
 import { startOfMonth } from 'date-fns';
 import mongoose from 'mongoose';
+import { sendPushNotification } from '../../../shared/firebase';
+import { User } from '../user/user.model';
+import { IPushNotification } from '../pushNotification/pushNotification.interface';
+import { PushNotificationService } from '../pushNotification/pushNotification.service';
+import moment from 'moment';
+import { PushNotification } from '../pushNotification/pushNotification.model';
+import { logger } from '../../../shared/logger';
 
 const addRoutine = async (payload: IAddRoutine) => {
   const isExistProduct = await Product.findOne({
@@ -171,10 +179,135 @@ const getRoutineDataChart = async (user: string) => {
   return chartData;
 };
 
+// const sendMsgWithTimeWise = async () => {
+//   try {
+//     const nowUTC = moment.utc();
+
+//     // Find routines whose startDate is in the past and still pending
+//     const routines = await AddRoutine.find({
+//       status: 'pending',
+//       startDate: { $lte: nowUTC.toDate() },
+//     }).select('startDate user');
+
+//     if (!routines.length) {
+//       return;
+//     }
+
+//     for (const routine of routines) {
+//       // Get the user FCM token
+//       const user = await User.findOne({
+//         _id: routine.user,
+//         fcmToken: { $exists: true, $ne: null },
+//       }).select('fcmToken');
+
+//       if (!user) {
+//         logger.error(`No valid FCM token for user ${routine.user}`);
+//         continue;
+//       }
+
+//       const token: any = user.fcmToken;
+
+//       console.log(token);
+
+//       // Send push notification directly
+//       const notification = await sendPushNotification([token], {
+//         title: 'Routine Notification',
+//         body: 'Your routine starts now!',
+//       });
+
+//       // Log it into PushNotification collection
+//       const res = await PushNotification.create({
+//         title: 'Routine Notification',
+//         body: 'Your routine starts now!',
+//         tokens: [token],
+//         userId: routine.user,
+//         status: notification.error ? 'failed' : 'sent',
+//       });
+
+//       return notification;
+//     }
+//   } catch (error) {
+//     console.error('Error in sendRoutineNotifications:', error);
+//   }
+// };
+
+const sendMsgWithTimeWise = async () => {
+  try {
+    const nowUTC = moment.utc();
+
+    // Find routines whose startDate is in the past and still pending
+    const routines = await AddRoutine.find({
+      status: 'pending',
+      startDate: { $lte: nowUTC.toDate() },
+    }).select('startDate user');
+
+    if (!routines.length) {
+      return { message: 'No pending routines to notify.' };
+    }
+
+    // Extract unique user IDs from routines
+    const userIds = [
+      ...new Set(routines.map(routine => routine.user.toString())),
+    ];
+
+    // Fetch all users with valid fcmTokens at once
+    const users = await User.find({
+      _id: { $in: userIds },
+      fcmToken: { $exists: true, $ne: null },
+    }).select('fcmToken');
+
+    // Map userId -> fcmToken for quick lookup
+    const userMap = new Map(users.map(u => [u._id.toString(), u.fcmToken]));
+
+    const results = [];
+
+    for (const routine of routines) {
+      const token = userMap.get(routine.user.toString());
+
+      if (!token) {
+        logger.error(`No valid FCM token for user ${routine.user}`);
+        continue;
+      }
+
+      // Send push notification directly
+      const notification = await sendPushNotification([token], {
+        title: 'Routine Notification',
+        body: 'Your routine starts now!',
+      });
+
+      // Log it into PushNotification collection
+      await PushNotification.create({
+        title: 'Routine Notification',
+        body: 'Your routine starts now!',
+        tokens: [token],
+        userId: routine.user,
+        status: notification.error ? 'failed' : 'sent',
+      });
+
+      await sendNotifications({
+        text: 'Routine Notification',
+        body: 'Your routine starts now!',
+        receiver: routine.user,
+      });
+
+      results.push({
+        userId: routine.user,
+        notificationStatus: notification.error ? 'failed' : 'sent',
+      });
+    }
+
+    return { message: 'Notifications processed', details: results };
+  } catch (error) {
+    console.error('Error in sendMsgWithTimeWise:', error);
+    throw error;
+  }
+};
+
 export const AddRoutineService = {
   addRoutine,
   getRoutineInHome,
   getAllRoutine,
   chanageStatus,
   getRoutineDataChart,
+  sendMsgWithTimeWise,
 };

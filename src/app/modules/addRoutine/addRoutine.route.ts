@@ -31,4 +31,9 @@ router.get(
   AddRoutineController.getRoutineDataChart
 );
 
+router.get(
+  '/send-msg-with-time-wise',
+  AddRoutineController.sendMsgWithTimeWise
+);
+
 export const AddRoutineRoutes = router;
