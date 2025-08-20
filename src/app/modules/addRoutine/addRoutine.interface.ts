@@ -6,8 +6,10 @@ export type IAddRoutine = {
   category: string;
   startDate: Date;
   endDate: Date;
-  order: number;
-  timeOfDay: string[];
+  morningOrder: number;
+  morningTimeOfDay: string[];
+  eveningOrder: number;
+  eveningTimeOfDay: string[];
   additionalIntroduction?: string;
   status: string;
   msgStatus?: string;

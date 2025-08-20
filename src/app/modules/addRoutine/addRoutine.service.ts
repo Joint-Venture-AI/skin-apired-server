@@ -135,13 +135,16 @@ const getAllRoutine = async (user: string, query: Record<string, unknown>) => {
 };
 
 const chanageStatus = async (id: string) => {
+  const isExist = await AddRoutine.findOne({ _id: id });
+  if (!isExist) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Routine not found');
+  }
+
   const result = await AddRoutine.findOneAndUpdate(
     { _id: id },
     { status: 'completed' },
     { new: true }
   );
-
-  console.log(result);
 
   return result;
 };
