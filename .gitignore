@@ -1,5 +1,4 @@
 node_modules
-.env
 
 /winston
 
@@ -7,3 +6,4 @@ node_modules
 /uploads/
 
 /dist/
+config.bat
