@@ -6,13 +6,13 @@ import { NotificationController } from './Notification.controller';
 const router = express.Router();
 
 router.get(
-  '/',
+  '/get-all',
   auth(USER_ROLES.USER),
   NotificationController.getNotificationToDb
 );
 
 router.patch(
-  '/',
+  '/update-read',
   auth(USER_ROLES.USER),
   NotificationController.readNotification
 );
